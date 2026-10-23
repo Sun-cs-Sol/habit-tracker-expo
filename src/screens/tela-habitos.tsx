@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Link, useRouter } from 'expo-router';
 
 import { BotaoAcao } from '../components/botao-acao';
 import { ItemHabito } from '../components/item-habito';
@@ -22,6 +23,7 @@ function Cabecalho({ busca, onBuscaChange }: { busca: string; onBuscaChange: (bu
 }
 
 export function TelaHabitos() {
+  const router = useRouter();
   const [habitos, setHabitos] = useState<Habito[]>(HABITOS);
   const [busca, setBusca] = useState('');
   const [atualizando, setAtualizando] = useState(false);
@@ -116,10 +118,17 @@ export function TelaHabitos() {
         ListHeaderComponent={<Cabecalho busca={busca} onBuscaChange={setBusca} />}
         contentContainerStyle={styles.conteudo}
       />
-      <BotaoAcao rotulo="Novo hábito" onPressionar={() => setRegistrando(true)} />
-      {/* TODO A1 / A2: adicione aqui a navegação para as novas rotas:
-          - Link para '/sobre' e Link para '/galeria' (Atividade 2)
-          - router.push('/registrar-foto') ou Link para '/registrar-foto' */}
+      <View style={styles.rodape}>
+        <BotaoAcao rotulo="Novo hábito" onPressionar={() => setRegistrando(true)} />
+        {/* router.push: é uma AÇÃO disparada pelo botão reutilizável da Aula 4, que só
+            sabe receber um onPressionar — não dá para embrulhá-lo num Link. */}
+        <BotaoAcao rotulo="Foto do hábito" onPressionar={() => router.push('/registrar-foto')} />
+        {/* Link: são DESTINOS fixos, declarados no JSX como um endereço. */}
+        <View style={styles.links}>
+          <Link href="/galeria" style={styles.link}>Galeria de progresso</Link>
+          <Link href="/sobre" style={styles.link}>Sobre o app</Link>
+        </View>
+      </View>
     </View>
   );
 }
@@ -147,4 +156,6 @@ const styles = StyleSheet.create({
   },
   separador: { height: espaco.sm },
   rodape: { padding: espaco.md, gap: espaco.sm },
+  links: { flexDirection: 'row', justifyContent: 'space-around' },
+  link: { fontSize: 16, color: cores.primaria, textDecorationLine: 'underline' },
 });

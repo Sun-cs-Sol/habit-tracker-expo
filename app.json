@@ -51,8 +51,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "TODO A2: por que o app quer as fotos — pensando em quem vai ler",
-          "cameraPermission": "TODO A3: por que o app quer a câmera",
+          "photosPermission": "O Habit Tracker abre as suas fotos para você escolher a foto de progresso de um hábito. Só as fotos que você escolher são usadas, e elas ficam só no aparelho.",
+          "cameraPermission": "O Habit Tracker usa a câmera para você tirar a foto de progresso de um hábito. A foto fica só no aparelho.",
           "microphonePermission": false
         }
       ]

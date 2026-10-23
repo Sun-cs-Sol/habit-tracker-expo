@@ -17,9 +17,10 @@ export default function TelaSobre() {
       <Text style={estilos.titulo}>Rastreador de Micro-hábitos</Text>
       <Text style={estilos.subtitulo}>Versão: Aula 6 (Navegação & Fotos)</Text>
 
-      {/* TODO A1.9: exiba aqui o texto explicando a limitação atual do app:
-                    "A foto registrada não volta para a lista de hábitos — levar
-                    dados entre telas será implementado na próxima aula." */}
+      <Text style={estilos.limitacao}>
+        Limitação conhecida: a foto registrada (na aba Foto ou na Galeria) não volta para
+        a lista de hábitos — levar dados entre telas será implementado na próxima aula.
+      </Text>
 
       <Pressable onPress={() => router.back()} style={estilos.botao}>
         <Text style={estilos.textoBotao}>Voltar</Text>
