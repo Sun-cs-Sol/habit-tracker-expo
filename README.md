@@ -1,7 +1,7 @@
 # Habit Tracker Expo
 
 **Disciplina:** Desenvolvimento Mobile (2026.2.DM) — CESAR School
-**Branch:** `feature/01_aula_intro`
+**Branch:** `feature/aula_06_navigation`
 
 ## Sobre o projeto
 
@@ -368,3 +368,63 @@ Os arquivos com a estrutura e comentários `// TODO` estão prontos para desenvo
 > ⚠️ **Limitação declarada das rotas (Restrições):**
 > A foto escolhida ou capturada em `/registrar-foto` (ou na `/galeria`) **não volta para a lista** — levar dados e estados entre diferentes telas é o conteúdo da Aula 7. Reconhecer e documentar essa fronteira faz parte da entrega da aula.
 
+
+## Decisões da Aula 6
+
+> Seção exigida pela Atividade 1 (item 6). Resolução da Parte 2 e troca do `Stack` por `Tabs`.
+
+**A migração.** Os seis passos foram seguidos: `"main": "expo-router/entry"` no
+`package.json`, `"scheme": "habittracker"` e `"expo-router"` uma única vez em `plugins` no
+`app.json`, `src/app/_layout.tsx` como moldura, `src/app/index.tsx` reexportando
+`../screens/tela-habitos` **sem mover a tela**, e `App.tsx`/`index.ts` apagados. O app abre
+na mesma lista de hábitos da Aula 4. `npx tsc --noEmit` passa limpo e
+`npx expo export --platform android` gera o bundle sem erro.
+
+**Rotas.** Quatro rotas estáticas, todas com título no `_layout.tsx`: `/` ("Meus hábitos"),
+`/registrar-foto` ("Foto do hábito"), `/galeria` ("Galeria do hábito") e `/sobre` ("Sobre o
+app").
+
+**Por que `Tabs`, e não `Drawer`.** O enunciado pede trocar o `Stack` por `Tabs` ou `Drawer`.
+Escolhemos `Tabs` (importado de `expo-router/js-tabs`; o `Tabs` exportado por `expo-router`
+está marcado como obsoleto no SDK 57). O `Drawer` do Expo Router exige
+`react-native-gesture-handler` e `react-native-reanimated`, duas dependências nativas que o
+projeto não tem; o `Tabs` já vem dentro do `expo-router`. Além disso, com só quatro destinos a
+barra inferior deixa todos visíveis e a um toque — o drawer esconderia três deles atrás de um
+gesto. Os ícones são emojis num `Text`, para não acrescentar `@expo/vector-icons` só por isso.
+
+**O que a troca mudou, e como foi tratado.**
+
+- **Não há pilha.** Abas são irmãs; nenhuma empilha sobre a outra. O padrão do `Tabs` é que o
+  "voltar" leve sempre à **primeira** aba. Usamos `backBehavior="history"`, para que o
+  `router.back()` do botão **Concluir** (e do **Voltar** do Sobre) e o botão voltar do Android
+  retornem à aba de onde o usuário veio — o contrato que essas telas tinham no `Stack`.
+- **`headerBackTitle: 'Hábitos'` saiu.** Sem pilha não há seta de voltar no cabeçalho, e a
+  opção nem existe no tipo das opções do `Tabs`.
+- **A aba não é desmontada.** No `Stack`, voltar desempilhava a tela e o estado sumia. Numa aba,
+  a tela continua montada: quem volta para "Foto" encontra a última foto escolhida. Não há custo
+  de recurso nisso — câmera e galeria são do sistema, leituras pontuais, sem assinatura aberta.
+
+**`Link` e `router.push`, cada um onde faz sentido.** Na tela inicial, "Galeria de progresso"
+e "Sobre o app" são `Link`: destinos fixos, declarados no JSX como um endereço. "Foto do
+hábito" usa `router.push('/registrar-foto')` porque é disparado pelo `BotaoAcao` da Aula 4, que
+só recebe um `onPressionar` — não dá para embrulhá-lo num `Link`. Os mesmos destinos também
+estão na barra de abas.
+
+**A tela de foto.** O contrato de três tempos está preenchido no topo de
+`src/app/registrar-foto.tsx`. As opções do picker são declaradas uma vez e tipadas
+(`ImagePicker.ImagePickerOptions`), e servem para a câmera e para a galeria. Cancelar não
+mostra mensagem nenhuma; câmera **negada** (`canAskAgain: true`) e **bloqueada**
+(`canAskAgain: false`) mostram mensagens diferentes, e as duas lembram que a galeria funciona
+sem permissão. **Concluir** fica desabilitado e apagado enquanto não há foto.
+
+**A galeria.** `src/app/galeria.tsx` escolhe até 6 fotos (`selectionLimit: 6`) e as mostra numa
+`FlatList` de 3 colunas. A miniatura mora em `src/components/miniatura-foto.tsx` — qualquer
+arquivo em `src/app/` vira rota. O `maxWidth: '33%'` impede a última foto de esticar, e o
+comentário no topo do arquivo explica por que seleção múltipla e recorte não convivem.
+
+**Limitação declarada.** A foto escolhida em `/registrar-foto` ou na `/galeria` **não volta
+para a lista de hábitos**. Levar dados entre telas é conteúdo da Aula 7. A limitação aparece
+também na tela `/sobre`.
+
+**Fora do escopo desta entrega.** Os TODOs numerados `5.x` (Aula 5) que ainda estão no código
+não fazem parte da Parte 2 da Aula 6 e foram deixados como estavam.
